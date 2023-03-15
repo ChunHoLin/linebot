@@ -1,0 +1,27 @@
+version: '3'
+networks:
+  web:
+    external: true
+  internal:
+    external: false
+services:
+  chatbot:
+    build:
+      context: ./linebot
+    image: chatbot
+    restart: always
+    environment:
+      - FLASK_APP=server.py
+    ports:
+      - "5000"
+    networks:
+      - internal
+      - web
+    labels:
+      - traefik.enable=true
+      - "traefik.http.routers.chatbot.entrypoints=websecure"
+      - traefik.http.routers.chatbot.rule=Host(`chatbot.szmcapp.webtai.cc`)
+      - traefik.http.routers.chatbot.tls=true
+      - traefik.http.routers.chatbot.tls.certresolver=lets-encrypt      
+      - traefik.port=8200
+     
