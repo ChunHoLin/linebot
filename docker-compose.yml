@@ -3,8 +3,8 @@ version: '3'
 services:
   user-service:
     build:
-      context: ./user
-    image: user-service-flask
+      context: ./linebot
+    image: chatbot
     environment:
       - FLASK_APP=server.py
     ports:
@@ -14,36 +14,4 @@ services:
     labels:
       - "traefik.http.routers.user.rule=Host(`user.localhost`)"
 
-  payment-service:
-    build:
-      context: ./payment
-    image: payment-service-flask
-    environment:
-      - FLASK_APP=server.py
-    ports:
-      - "5001"
-    networks:
-      - my-network
-    labels:
-      - "traefik.http.routers.payment.rule=Host(`payment.localhost`)"
 
-  reverse-proxy:
-    image: traefik:v2.2
-    # Enables the web UI and tells Traefik to listen to docker
-    command: --api.insecure=true --providers.docker
-    volumes:
-      # So that Traefik can listen to the Docker events
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-    ports:
-      - "80:80"
-      # The Web UI (enabled by --api.insecure=true)
-      - "8080:8080"
-    networks:
-      - my-network
-    depends_on:
-      - user-service
-      - payment-service
-
-networks:
-  my-network:
-    driver: bridge
